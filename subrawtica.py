@@ -1,4 +1,6 @@
 from functools import lru_cache
+import os
+import sys
 
 import requests
 import requests_cache
@@ -153,45 +155,51 @@ def getMaterialRecipe(material_name):
     print(recipe_station[0], end=" -> ")
     print(", ".join(recipe_output))
 
-# cache every page grabbed
-requests_cache.install_cache("wikiCache")
-
-# also cache known raw materials and known recipes
 try:
-    with open("knownRawMaterials.pickle", "rb") as known_raw_materials_handle:
-        known_raw_materials = pickle.load(known_raw_materials_handle)
-    with open("knownRecipes.pickle", "rb") as known_recipes_handle:
-        known_recipes = pickle.load(known_recipes_handle)
-except:
-    known_raw_materials = {}
-    known_recipes = {}
-    print("No cache found.")
+    # cache every page grabbed
+    requests_cache.install_cache("wikiCache")
 
-user_input = " "
-raw_mats_list = []
-raw_mats_dict = {}
+    # also cache known raw materials and known recipes
+    try:
+        with open("knownRawMaterials.pickle", "rb") as known_raw_materials_handle:
+            known_raw_materials = pickle.load(known_raw_materials_handle)
+        with open("knownRecipes.pickle", "rb") as known_recipes_handle:
+            known_recipes = pickle.load(known_recipes_handle)
+    except:
+        known_raw_materials = {}
+        known_recipes = {}
+        print("No cache found.")
 
-while user_input != "":
-    user_input = input("Enter an item name.\n")
-    start_time = time.time()
-    status = getMaterialRecipe(user_input)
-    if status == 1:
-        # when finished, create frequency dictionary of raw materials and print
-        for item in raw_mats_list:
-            if item not in raw_mats_dict:
-                raw_mats_dict[item] = 1
-            elif item in raw_mats_dict:
-                raw_mats_dict[item] += 1
-        print('\n')
-        for key, value in raw_mats_dict.items():
-            print('\t', value, key)
-        raw_mats_list = []
-        raw_mats_dict = {}
-        print("\n\ttime elapsed: {:.1f}s\n".format(time.time() - start_time))
+    user_input = " "
+    raw_mats_list = []
+    raw_mats_dict = {}
 
-        with open("knownRawMaterials.pickle", "wb") as known_raw_materials_handle:
-            pickle.dump(
-                known_raw_materials, known_raw_materials_handle, protocol=pickle.HIGHEST_PROTOCOL
-            )
-        with open("knownRecipes.pickle", "wb") as known_recipes_handle:
-            pickle.dump(known_recipes, known_recipes_handle, protocol=pickle.HIGHEST_PROTOCOL)
+    while user_input != "":
+        user_input = input("Enter an item name.\n")
+        start_time = time.time()
+        status = getMaterialRecipe(user_input)
+        if status == 1:
+            # when finished, create frequency dictionary of raw materials and print
+            for item in raw_mats_list:
+                if item not in raw_mats_dict:
+                    raw_mats_dict[item] = 1
+                elif item in raw_mats_dict:
+                    raw_mats_dict[item] += 1
+            print('\n')
+            for key, value in raw_mats_dict.items():
+                print('\t', value, key)
+            raw_mats_list = []
+            raw_mats_dict = {}
+            print("\n\ttime elapsed: {:.1f}s\n".format(time.time() - start_time))
+
+            with open("knownRawMaterials.pickle", "wb") as known_raw_materials_handle:
+                pickle.dump(
+                    known_raw_materials, known_raw_materials_handle, protocol=pickle.HIGHEST_PROTOCOL
+                )
+            with open("knownRecipes.pickle", "wb") as known_recipes_handle:
+                pickle.dump(known_recipes, known_recipes_handle, protocol=pickle.HIGHEST_PROTOCOL)
+except KeyboardInterrupt:
+    try:
+        sys.exit(0)
+    except:
+        os._exit(0)
