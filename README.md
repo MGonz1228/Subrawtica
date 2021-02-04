@@ -2,7 +2,7 @@
 Command line application that recursively scrapes the [Subnautica Wiki](https://subnautica.fandom.com/wiki/Subnautica_Wiki) to break down any item into its raw materials.
 
 ### Install requirements
-```pip install requests && pip install beautifulsoup4￼```
+```pip install requests && pip install requests_cache && pip install beautifulsoup4￼```
 
 ### Run
 ```python3 subrawtica.py```
